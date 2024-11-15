@@ -6,7 +6,7 @@ class TopBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     bool disabled = false;
-    String currentPath = "/home/user/documents"; // 示例当前路径
+    String currentPath = "C:"; // 示例当前路径
 
     return Padding(
       padding: const EdgeInsets.all(8.0), // 设置所有方向的边距为 8.0
