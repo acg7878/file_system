@@ -38,12 +38,12 @@ class TopBar extends StatelessWidget {
             ],
           ),
           const Spacer(), // 添加 Spacer 以将右边的按钮推到最右边
-          Button(
+          FilledButton(
             child: const Text('新建文件'),
             onPressed: disabled ? null : () => debugPrint('pressed button'),
           ),
           const SizedBox(width: 8),
-          Button(
+          FilledButton(
             child: const Text('新建文件夹'),
             onPressed: disabled ? null : () => debugPrint('pressed button'),
           )

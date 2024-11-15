@@ -1,14 +1,45 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' as material;
+import 'package:fluent_ui/fluent_ui.dart';
 
-class DisplayBox extends StatelessWidget {
+class DisplayBox extends StatefulWidget {
   const DisplayBox({super.key});
 
   @override
+  _DisplayBoxState createState() => _DisplayBoxState();
+}
+
+class _DisplayBoxState extends State<DisplayBox> {
+  @override
   Widget build(BuildContext context) {
     return Container(
-      color: Colors.blue,
-      child: Center(
-
+      decoration: BoxDecoration(
+        border: Border.all(
+          color: Colors.black, // 边框颜色
+          width: 1, // 边框宽度
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8.0),
+            child: const Text(
+              '文件管理',
+              style: TextStyle(
+                color: material.Colors.black, // 文字颜色
+                fontSize: 20, // 文字大小
+                fontWeight: FontWeight.bold, // 文字加粗
+              ),
+            ),
+          ),
+         
+         
+          Expanded(
+            child: Center(
+              
+            ),
+          ),
+        ],
       ),
     );
   }

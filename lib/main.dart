@@ -52,11 +52,11 @@ class MyApp extends StatelessWidget {
                         child: Catalog(),
                       ),
                       Expanded(
-                        flex: 6, // 右边占30%
+                        flex: 5, // 右边占30%
                         child: DisplayBox(),
                       ),
                       Expanded(
-                        flex: 2, // 右边占30%
+                        flex: 3, // 右边占30%
                         child: FuncArea(),
                       ),
                     ],

@@ -1,8 +1,14 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' as material;
+import 'package:fluent_ui/fluent_ui.dart';
 
-class Catalog extends StatelessWidget {
+class Catalog extends StatefulWidget {
   const Catalog({super.key});
 
+  @override
+  _CatalogState createState() => _CatalogState();
+}
+
+class _CatalogState extends State<Catalog> {
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -20,18 +26,17 @@ class Catalog extends StatelessWidget {
             child: const Text(
               '目录',
               style: TextStyle(
-                color: Colors.black, // 文字颜色
+                color: material.Colors.black, // 文字颜色
                 fontSize: 20, // 文字大小
                 fontWeight: FontWeight.bold, // 文字加粗
               ),
             ),
           ),
+         
+         
           Expanded(
             child: Center(
-              child: Text(
-                '内容区域',
-                style: TextStyle(fontSize: 16),
-              ),
+              
             ),
           ),
         ],
