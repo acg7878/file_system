@@ -11,4 +11,12 @@ class Path {
     required this.diskNum,
     this.parentPath,
   });
+
+  String getAbsolutePath() {
+    if (parentPath == null) {
+      return name;
+    } else {
+      return '${parentPath!.getAbsolutePath()}/$name';
+    }
+  }
 }

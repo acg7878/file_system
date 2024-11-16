@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart' as material;
 import 'package:fluent_ui/fluent_ui.dart';
-
+import 'package:file_system/modles/FAT.dart';
 class FuncArea extends StatefulWidget {
-  const FuncArea({super.key});
+  final FAT fat;
+  const FuncArea({super.key,required this.fat});
 
   @override
   _FuncAreaState createState() => _FuncAreaState();

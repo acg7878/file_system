@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart' as material;
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:file_system/modles/FAT.dart';
 
 class Catalog extends StatefulWidget {
-  const Catalog({super.key});
+  final FAT fat;
+  const Catalog({super.key, required this.fat});
 
   @override
   _CatalogState createState() => _CatalogState();
@@ -32,12 +34,8 @@ class _CatalogState extends State<Catalog> {
               ),
             ),
           ),
-         
-         
           Expanded(
-            child: Center(
-              
-            ),
+            child: Center(),
           ),
         ],
       ),

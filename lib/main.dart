@@ -1,21 +1,22 @@
-import 'package:file_system/views/TopBar.dart';
 import 'package:flutter/material.dart';
 import 'package:window_manager/window_manager.dart';
-import 'views/Catalog.dart';
-import 'views/DisplayBox.dart';
-import 'views/FuncArea.dart';
 import 'package:fluent_ui/fluent_ui.dart' as FluentUI;
+import 'package:file_system/views/Catalog.dart';
+import 'package:file_system/views/DisplayBox.dart';
+import 'package:file_system/views/FuncArea.dart';
+import 'package:file_system/views/TopBar.dart';
+import 'package:file_system/modles/FAT.dart';
+import 'package:file_system/modles/Path.dart';
+import 'package:file_system/utils/FAT_utils.dart' as fat_utils;
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // Must add this line.
   await windowManager.ensureInitialized();
 
   WindowOptions windowOptions = const WindowOptions(
     size: Size(1100, 750),
     center: true,
-    backgroundColor: Colors.transparent,
-    //skipTaskbar: false,
-    //titleBarStyle: TitleBarStyle.hidden,
+    backgroundColor: FluentUI.Colors.white, // 设置背景颜色为白色
   );
   windowManager.waitUntilReadyToShow(windowOptions, () async {
     await windowManager.setMinimumSize(const Size(1100, 750));
@@ -23,41 +24,104 @@ void main() async {
     await windowManager.show();
     await windowManager.focus();
   });
-   runApp(FluentUI.FluentApp(
+
+  runApp(FluentUI.FluentApp(
     home: MyApp(),
   ));
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
   @override
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  late FAT fat;
+  late Path rootPath;
+  late Path curPath;
+
+  @override
+  void initState() {
+    super.initState();
+    fat = FAT();
+    rootPath = fat.rootPath;
+    curPath = fat.curPath;
+  }
+
+  void _createFolder() {
+    setState(() {
+      fat.createFolder(curPath);
+    });
+  }
+
+  void _createFile() {
+    setState(() {
+      fat.createFile(curPath);
+    });
+  }
+
+  void _goBack() {
+    setState(() {
+      if (curPath.parentPath != null) {
+        curPath = curPath.parentPath!;
+      }
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return FluentUI.FluentApp(
       home: Scaffold(
         body: Center(
           child: Column(
             children: [
-              const SizedBox(
-              height: 50, // 设置具体的高度
-              child: TopBar(),
-            ),
+              SizedBox(
+                height: 50, // 设置具体的高度
+                child: TopBar(
+                  onCreateFolder: _createFolder,
+                  onCreateFile: _createFile,
+                  onBack: _goBack,
+                  currentPath: curPath.getAbsolutePath(),
+                ),
+              ),
               Expanded(
                 flex: 9, // 右边占30%
                 child: Container(
-                  child: const Row(
+                  child: Row(
                     children: [
                       Expanded(
                         flex: 2,
-                        child: Catalog(),
+                        child: Catalog(fat: fat),
                       ),
                       Expanded(
                         flex: 5, // 右边占30%
-                        child: DisplayBox(),
+                        child: DisplayBox(
+                          fat: fat,
+                          files: curPath.children
+                              .where((child) => fat.diskBlocks[child.diskNum].type == fat_utils.Type.FILE)
+                              .map((child) => child.name)
+                              .toList(), // 传递文件列表
+                          folders: curPath.children
+                              .where((child) => fat.diskBlocks[child.diskNum].type == fat_utils.Type.FOLDER)
+                              .map((child) => child.name)
+                              .toList(), // 传递文件夹列表
+                          onFolderTap: (folderName) {
+                            // 处理文件夹点击事件
+                            final folderPath = curPath.children.firstWhere(
+                              (child) => child.name == folderName && fat.diskBlocks[child.diskNum].type == fat_utils.Type.FOLDER,
+                            );
+                            setState(() {
+                              curPath = folderPath;
+                            });
+                            debugPrint('Folder tapped: $folderName');
+                          },
+                        ),
                       ),
                       Expanded(
                         flex: 3, // 右边占30%
-                        child: FuncArea(),
+                        child: FuncArea(fat: fat),
                       ),
                     ],
                   ),

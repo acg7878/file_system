@@ -7,6 +7,7 @@ import 'Path.dart';
 class FAT {
   late Folder rootFolder; //初始文件夹
   late Path rootPath; //初始路径
+  late Path curPath;
   List<DiskBlock> diskBlocks = [];
 
   FAT() {
@@ -16,6 +17,7 @@ class FAT {
             DiskBlock(blockNumber: index, state: State.FREE, type: Type.NULL));
     rootFolder = Folder(name: 'C:', diskNum: 0);
     rootPath = Path(name: 'C:', diskNum: 0);
+    curPath = rootPath;
     diskBlocks[0] = DiskBlock(
         blockNumber: 0,
         state: State.USED,
@@ -59,6 +61,7 @@ class FAT {
     Path newPath =
         Path(name: folderName, parentPath: parentPath, diskNum: freeBlockIndex);
     parentPath.children.add(newPath);
+    printStructure();
     return freeBlockIndex;
   }
 
@@ -92,6 +95,7 @@ class FAT {
     Path newPath =
         Path(name: fileName, parentPath: parentPath, diskNum: freeBlockIndex);
     parentPath.children.add(newPath);
+    printStructure();
     return freeBlockIndex;
   }
 
