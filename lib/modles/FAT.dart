@@ -21,7 +21,7 @@ class FAT {
     diskBlocks[0] = DiskBlock(
         blockNumber: 0,
         state: State.USED,
-        type: Type.FOLDER,
+        type: Type.DISK,
         folder: rootFolder);
   }
 

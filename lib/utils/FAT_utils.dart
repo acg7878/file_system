@@ -6,5 +6,6 @@ enum State {
 enum Type {
   FILE,
   FOLDER,
+  DISK,
   NULL
 }

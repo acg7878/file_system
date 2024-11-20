@@ -9,6 +9,7 @@ class File {
   Folder parentFolder; // 至少有个父文件夹是C:
   DateTime createTime;
   String content;
+  bool isReadOnly = false;
   File({
     required this.fileName,
     this.type = Type.FILE,
@@ -16,5 +17,6 @@ class File {
     required this.parentFolder,
     this.content = '',
     DateTime? createTime,
+    
   }) : createTime = createTime ?? DateTime.now();
 }
