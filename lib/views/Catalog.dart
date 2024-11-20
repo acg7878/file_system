@@ -34,7 +34,7 @@ class _CatalogState extends State<Catalog> {
               ),
             ),
           ),
-          Expanded(
+          const Expanded(
             child: Center(),
           ),
         ],

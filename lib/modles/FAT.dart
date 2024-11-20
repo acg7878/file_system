@@ -95,6 +95,7 @@ class FAT {
     Path newPath =
         Path(name: fileName, parentPath: parentPath, diskNum: freeBlockIndex);
     parentPath.children.add(newPath);
+    diskBlocks[parentPath.diskNum].folder!.childrenFile.add(newFile);//TODO
     printStructure();
     return freeBlockIndex;
   }

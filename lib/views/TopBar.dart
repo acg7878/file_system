@@ -7,16 +7,16 @@ class TopBar extends StatelessWidget {
   final VoidCallback onBack;
   final String currentPath;
   const TopBar({
-    Key? key,
+    super.key,
     required this.onCreateFile,
     required this.onCreateFolder,
     required this.onBack,
     required this.currentPath,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
-    bool disabled = false;
+    //bool disabled = false;
     //String currentPath = "C:"; // 示例当前路径
 
     return Padding(
@@ -27,7 +27,7 @@ class TopBar extends StatelessWidget {
             children: [
               IconButton(
                 icon: const Icon(FluentIcons.chrome_back, size: 20.0),
-                onPressed: disabled ? null : onBack,
+                onPressed: onBack,
               ),
               //const SizedBox(width: 16),
               const Text(
@@ -50,13 +50,13 @@ class TopBar extends StatelessWidget {
           ),
           const Spacer(), // 添加 Spacer 以将右边的按钮推到最右边
           FilledButton(
-            child: const Text('新建文件'),
             onPressed: onCreateFile,
+            child: const Text('新建文件'),
           ),
           const SizedBox(width: 8),
           FilledButton(
-            child: const Text('新建文件夹'),
             onPressed: onCreateFolder,
+            child: const Text('新建文件夹'),
           )
         ],
       ),

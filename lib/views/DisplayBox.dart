@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:fluent_ui/fluent_ui.dart' as FluentUI;
 import 'package:file_system/modles/FAT.dart';
-import 'package:file_system/modles/Path.dart' as file_system;
+import 'package:file_system/modles/File.dart'; // 引入 File 模块
+import 'package:file_system/utils/FAT_utils.dart' as fat_utils;
 
 class DisplayBox extends StatefulWidget {
   final FAT fat;
-  final List<String> files; // 当前路径下的文件
-  final List<String> folders; // 当前路径下的文件夹
+  final List<File> files; // 文件列表（File对象）
+  final List<String> folders; // 文件夹列表
   final Function(String) onFolderTap; // 点击文件夹时的回调
+  final Function(File) onDeleteFile; // 删除文件回调
+  final Function(Path) onDeleteFolder; // 删除文件夹回调
 
   const DisplayBox({
     super.key,
@@ -15,6 +18,8 @@ class DisplayBox extends StatefulWidget {
     required this.files,
     required this.folders,
     required this.onFolderTap,
+    required this.onDeleteFile,
+    required this.onDeleteFolder,
   });
 
   @override
@@ -22,20 +27,16 @@ class DisplayBox extends StatefulWidget {
 }
 
 class _DisplayBoxState extends State<DisplayBox> {
-  void _editFile(String fileName) {
-    final file = widget.fat.diskBlocks
-        .firstWhere((block) => block.file?.fileName == fileName)
-        .file;
-
-    if (file == null) return;
-
-    TextEditingController controller = TextEditingController(text: file.content);
+  // 修改 _editFile 接受 File 对象作为参数
+  void _editFile(File file) {
+    // 获取文件内容
+    final controller = TextEditingController(text: file.content);
 
     showDialog(
       context: context,
       builder: (context) {
         return FluentUI.ContentDialog(
-          title: Text('编辑文件: $fileName'),
+          title: Text('编辑文件: ${file.fileName}'),
           content: FluentUI.TextBox(
             controller: controller,
             maxLines: 10,
@@ -46,7 +47,7 @@ class _DisplayBoxState extends State<DisplayBox> {
               child: const Text('保存'),
               onPressed: () {
                 setState(() {
-                  file.content = controller.text;
+                  file.content = controller.text; // 更新文件内容
                 });
                 Navigator.of(context).pop();
                 controller.dispose();
@@ -65,6 +66,7 @@ class _DisplayBoxState extends State<DisplayBox> {
     );
   }
 
+  
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -91,15 +93,17 @@ class _DisplayBoxState extends State<DisplayBox> {
           Expanded(
             child: FluentUI.ListView(
               children: [
+                // 显示文件夹
                 ...widget.folders.map((folder) => FluentUI.ListTile(
                       leading: const Icon(FluentUI.FluentIcons.folder),
                       title: Text(folder),
                       onPressed: () => widget.onFolderTap(folder),
                     )),
+                // 显示文件
                 ...widget.files.map((file) => FluentUI.ListTile(
                       leading: const Icon(FluentUI.FluentIcons.file_code),
-                      title: Text(file),
-                      onPressed: () => _editFile(file),
+                      title: Text(file.fileName), // 显示文件名
+                      onPressed: () => _editFile(file), // 点击文件时传递文件对象
                     )),
               ],
             ),

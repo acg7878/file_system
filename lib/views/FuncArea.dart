@@ -35,7 +35,7 @@ class _FuncAreaState extends State<FuncArea> {
           ),
          
          
-          Expanded(
+          const Expanded(
             child: Center(
               
             ),

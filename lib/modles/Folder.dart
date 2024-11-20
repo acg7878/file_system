@@ -1,7 +1,5 @@
-import 'dart:io';
-
 import 'package:file_system/utils/FAT_utils.dart';
-
+import 'File.dart';
 class Folder {
   String name;
   Type type;

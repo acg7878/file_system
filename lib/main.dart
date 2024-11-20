@@ -25,7 +25,7 @@ void main() async {
     await windowManager.focus();
   });
 
-  runApp(FluentUI.FluentApp(
+  runApp(const FluentUI.FluentApp(
     home: MyApp(),
   ));
 }
@@ -96,29 +96,33 @@ class _MyAppState extends State<MyApp> {
                         child: Catalog(fat: fat),
                       ),
                       Expanded(
-                        flex: 5, // 右边占30%
-                        child: DisplayBox(
-                          fat: fat,
-                          files: curPath.children
-                              .where((child) => fat.diskBlocks[child.diskNum].type == fat_utils.Type.FILE)
-                              .map((child) => child.name)
-                              .toList(), // 传递文件列表
-                          folders: curPath.children
-                              .where((child) => fat.diskBlocks[child.diskNum].type == fat_utils.Type.FOLDER)
-                              .map((child) => child.name)
-                              .toList(), // 传递文件夹列表
-                          onFolderTap: (folderName) {
-                            // 处理文件夹点击事件
-                            final folderPath = curPath.children.firstWhere(
-                              (child) => child.name == folderName && fat.diskBlocks[child.diskNum].type == fat_utils.Type.FOLDER,
-                            );
-                            setState(() {
-                              curPath = folderPath;
-                            });
-                            debugPrint('Folder tapped: $folderName');
-                          },
-                        ),
-                      ),
+                          flex: 5, // 右边占30%
+                          child: DisplayBox(
+                            fat: fat, 
+                            files: curPath.children
+                                .where((child) =>
+                                    fat.diskBlocks[child.diskNum].type ==
+                                    fat_utils.Type.FILE)
+                                .map((child) => fat.diskBlocks[child.diskNum]
+                                    .file!) // 直接传入文件对象
+                                .toList(),
+                            folders: curPath.children
+                                .where((child) =>
+                                    fat.diskBlocks[child.diskNum].type ==
+                                    fat_utils.Type.FOLDER)
+                                .map((child) => child.name)
+                                .toList(),
+                            onFolderTap: (folderName) {
+                              setState(() {
+                                curPath = curPath.children.firstWhere(
+                                  (child) =>
+                                      child.name == folderName &&
+                                      fat.diskBlocks[child.diskNum].type ==
+                                          fat_utils.Type.FOLDER,
+                                );
+                              });
+                            },
+                          )),
                       Expanded(
                         flex: 3, // 右边占30%
                         child: FuncArea(fat: fat),
