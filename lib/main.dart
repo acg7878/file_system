@@ -70,6 +70,11 @@ class _MyAppState extends State<MyApp> {
     });
   }
 
+   void _onUpdate() {
+    setState(() {
+      // 触发整个界面的重建，包括 FuncArea
+    });
+  }
   @override
   Widget build(BuildContext context) {
     return FluentUI.FluentApp(
@@ -122,6 +127,7 @@ class _MyAppState extends State<MyApp> {
                                 );
                               });
                             },
+                            onUpdate: _onUpdate,
                           )),
                       Expanded(
                         flex: 3, // 右边占30%

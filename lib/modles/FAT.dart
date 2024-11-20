@@ -48,6 +48,10 @@ class FAT {
       folderName = '$baseName$folderIndex';
     }
     Folder newFolder = Folder(name: folderName, diskNum: freeBlockIndex);
+    diskBlocks[parentPath.diskNum]
+        .folder!
+        .childrenFolder
+        .add(newFolder); //添加新创建的文件夹到父文件夹里面
     diskBlocks[freeBlockIndex] = DiskBlock(
       blockNumber: freeBlockIndex,
       state: State.USED,
@@ -95,9 +99,106 @@ class FAT {
     Path newPath =
         Path(name: fileName, parentPath: parentPath, diskNum: freeBlockIndex);
     parentPath.children.add(newPath);
-    diskBlocks[parentPath.diskNum].folder!.childrenFile.add(newFile);//TODO
+    diskBlocks[parentPath.diskNum]
+        .folder!
+        .childrenFile
+        .add(newFile); //添加新创建的文件到父文件夹里面
     printStructure();
     return freeBlockIndex;
+  }
+
+  bool deleteFolder(Path parentPath, String folderName) {
+    try {
+      // 找到需要删除的文件夹
+      Path folderPath = parentPath.children.firstWhere(
+        (child) =>
+            child.name == folderName &&
+            diskBlocks[child.diskNum].type == Type.FOLDER,
+        orElse: () => throw Exception('Folder not found'),
+      );
+
+      // 获取文件夹对象
+      Folder folderToDelete = diskBlocks[folderPath.diskNum].folder!;
+
+      // 删除文件夹内的所有文件和子文件夹（递归删除）
+      // 删除文件夹内的所有文件
+      for (var file in List.from(folderToDelete.childrenFile)) {
+        // 释放文件的磁盘块
+        diskBlocks[file.diskNum] = DiskBlock(
+          blockNumber: file.diskNum,
+          state: State.FREE, // 释放磁盘块
+          type: Type.NULL,
+        );
+        folderToDelete.childrenFile.remove(file); // 移除文件
+        print("文件 ${file.fileName} 已删除");
+      }
+
+      // 递归删除所有子文件夹
+      for (var subFolder in List.from(folderToDelete.childrenFolder)) {
+        // 删除子文件夹
+        deleteFolder(folderPath, subFolder.name); // 递归删除
+      }
+
+      // 从父文件夹的 childrenFolder 中移除文件夹
+      diskBlocks[parentPath.diskNum]
+          .folder!
+          .childrenFolder
+          .remove(folderToDelete);
+
+      // 从父路径的 children 中移除路径
+      parentPath.children.remove(folderPath);
+
+      // 释放磁盘块
+      diskBlocks[folderPath.diskNum] = DiskBlock(
+        blockNumber: folderPath.diskNum,
+        state: State.FREE, // 释放磁盘块
+        type: Type.NULL,
+      );
+
+      // 输出文件系统结构，方便调试
+      printStructure();
+
+      return true; // 删除成功
+    } catch (e) {
+      print('Error deleting folder: $e');
+      return false; // 删除失败
+    }
+  }
+
+  bool deleteFile(Path parentPath, String fileName) {
+    try {
+      // 找到需要删除的文件
+      Path filePath = parentPath.children.firstWhere(
+        (child) =>
+            child.name == fileName &&
+            diskBlocks[child.diskNum].type == Type.FILE,
+        orElse: () => throw Exception('File not found'),
+      );
+
+      // 获取文件对象
+      File fileToDelete = diskBlocks[filePath.diskNum].file!;
+
+      // 从父文件夹的 childrenFile 中移除文件
+      diskBlocks[parentPath.diskNum].folder!.childrenFile.remove(fileToDelete);
+
+      // 从父路径的 children 中移除路径
+      parentPath.children.remove(filePath);
+
+      // 释放磁盘块
+      diskBlocks[filePath.diskNum] = DiskBlock(
+        blockNumber: filePath.diskNum,
+        state: State.FREE, // 释放磁盘块
+        type: Type.NULL,
+      );
+
+      // 输出文件系统结构，方便调试
+      printStructure();
+
+      return true; // 删除成功
+    } catch (e) {
+      print('Error deleting file: $e');
+      return false; // 删除失败
+    }
   }
 
   // 新增：打印文件系统结构

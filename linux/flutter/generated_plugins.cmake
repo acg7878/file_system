@@ -3,7 +3,9 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
+  native_context_menu_ng
   screen_retriever_linux
+  url_launcher_linux
   window_manager
 )
 

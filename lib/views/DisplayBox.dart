@@ -3,14 +3,16 @@ import 'package:fluent_ui/fluent_ui.dart' as FluentUI;
 import 'package:file_system/modles/FAT.dart';
 import 'package:file_system/modles/File.dart'; // 引入 File 模块
 import 'package:file_system/utils/FAT_utils.dart' as fat_utils;
+import 'package:file_system/modles/Path.dart';
+import 'package:file_system/modles/Folder.dart'; // 引入 Folder 模块
+import 'package:context_menus/context_menus.dart';
 
 class DisplayBox extends StatefulWidget {
   final FAT fat;
   final List<File> files; // 文件列表（File对象）
   final List<String> folders; // 文件夹列表
   final Function(String) onFolderTap; // 点击文件夹时的回调
-  final Function(File) onDeleteFile; // 删除文件回调
-  final Function(Path) onDeleteFolder; // 删除文件夹回调
+  final VoidCallback onUpdate;
 
   const DisplayBox({
     super.key,
@@ -18,8 +20,7 @@ class DisplayBox extends StatefulWidget {
     required this.files,
     required this.folders,
     required this.onFolderTap,
-    required this.onDeleteFile,
-    required this.onDeleteFolder,
+    required this.onUpdate,  
   });
 
   @override
@@ -31,7 +32,6 @@ class _DisplayBoxState extends State<DisplayBox> {
   void _editFile(File file) {
     // 获取文件内容
     final controller = TextEditingController(text: file.content);
-
     showDialog(
       context: context,
       builder: (context) {
@@ -66,7 +66,35 @@ class _DisplayBoxState extends State<DisplayBox> {
     );
   }
 
-  
+  void _deleteFile(Path currentPath, String fileName) {
+    bool success = widget.fat.deleteFile(currentPath, fileName); // 使用当前路径和文件名删除
+    if (success) {
+      setState(() {
+      widget.files.removeWhere((file) => file.fileName == fileName); // 从文件列表中移除文件
+      widget.onUpdate(); 
+    });
+      print("文件 $fileName 已删除");
+    } else {
+      print("删除文件失败");
+    }
+  }
+
+  // 右键删除文件夹
+  void _deleteFolder(Path currentPath, String folderName) {
+    // 调用 FAT 类中的 deleteFolder 方法来删除文件夹
+    final success = widget.fat.deleteFolder(currentPath, folderName);
+
+    if (success) {
+      setState(() {
+        widget.folders.remove(folderName); // 从文件夹列表中移除已删除的文件夹
+        widget.onUpdate(); 
+      });
+      print("文件夹 $folderName 已删除");
+    } else {
+      print("删除文件夹失败");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -91,21 +119,40 @@ class _DisplayBoxState extends State<DisplayBox> {
             ),
           ),
           Expanded(
-            child: FluentUI.ListView(
-              children: [
-                // 显示文件夹
-                ...widget.folders.map((folder) => FluentUI.ListTile(
-                      leading: const Icon(FluentUI.FluentIcons.folder),
-                      title: Text(folder),
-                      onPressed: () => widget.onFolderTap(folder),
-                    )),
-                // 显示文件
-                ...widget.files.map((file) => FluentUI.ListTile(
-                      leading: const Icon(FluentUI.FluentIcons.file_code),
-                      title: Text(file.fileName), // 显示文件名
-                      onPressed: () => _editFile(file), // 点击文件时传递文件对象
-                    )),
-              ],
+            child: ContextMenuOverlay(
+              child: FluentUI.ListView(
+                children: [
+                  // 显示文件夹
+                  ...widget.folders.map((folder) => ContextMenuRegion(
+                        contextMenu: GenericContextMenu(
+                          buttonConfigs: [
+                            ContextMenuButtonConfig("删除文件夹",
+                                onPressed: () => _deleteFolder(widget.fat.curPath, folder)),
+                          ],
+                        ),
+                        child: FluentUI.ListTile(
+                          leading: const Icon(FluentUI.FluentIcons.folder),
+                          title: Text(folder),
+                          onPressed: () => widget.onFolderTap(folder),
+                        ),
+                      )),
+                  // 显示文件
+                  ...widget.files.map((file) => ContextMenuRegion(
+                        contextMenu: GenericContextMenu(
+                          buttonConfigs: [
+                            ContextMenuButtonConfig("删除文件",
+                                onPressed: () =>
+                                    _deleteFile(widget.fat.curPath, file.fileName)),
+                          ],
+                        ),
+                        child: FluentUI.ListTile(
+                          leading: const Icon(FluentUI.FluentIcons.file_code),
+                          title: Text(file.fileName),
+                          onPressed: () => _editFile(file),
+                        ),
+                      )),
+                ],
+              ),
             ),
           )
         ],
