@@ -157,7 +157,6 @@ class FAT {
 
       // 输出文件系统结构，方便调试
       printStructure();
-
       return true; // 删除成功
     } catch (e) {
       print('Error deleting folder: $e');

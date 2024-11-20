@@ -9,6 +9,7 @@ import 'package:context_menus/context_menus.dart';
 
 class DisplayBox extends StatefulWidget {
   final FAT fat;
+  final Path curPath;
   final List<File> files; // 文件列表（File对象）
   final List<String> folders; // 文件夹列表
   final Function(String) onFolderTap; // 点击文件夹时的回调
@@ -16,6 +17,7 @@ class DisplayBox extends StatefulWidget {
 
   const DisplayBox({
     super.key,
+    required this.curPath,
     required this.fat,
     required this.files,
     required this.folders,
@@ -182,7 +184,7 @@ class _DisplayBoxState extends State<DisplayBox> {
                                 onPressed: () => _toggleReadOnly(file)),
                             ContextMenuButtonConfig("删除文件",
                                 onPressed: () => _deleteFile(
-                                    widget.fat.curPath, file.fileName)),
+                                    widget.curPath, file.fileName)),
                           ],
                         ),
                         child: FluentUI.ListTile(

@@ -16,7 +16,7 @@ void main() async {
   WindowOptions windowOptions = const WindowOptions(
     size: Size(1100, 750),
     center: true,
-    backgroundColor: FluentUI.Colors.white, // 设置背景颜色为白色
+    backgroundColor: FluentUI.Colors.white,
   );
   windowManager.waitUntilReadyToShow(windowOptions, () async {
     await windowManager.setMinimumSize(const Size(1100, 750));
@@ -39,15 +39,13 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   late FAT fat;
-  late Path rootPath;
   late Path curPath;
 
   @override
   void initState() {
     super.initState();
     fat = FAT();
-    rootPath = fat.rootPath;
-    curPath = fat.curPath;
+    curPath = fat.rootPath; // 初始化路径为根路径
   }
 
   void _createFolder() {
@@ -66,15 +64,24 @@ class _MyAppState extends State<MyApp> {
     setState(() {
       if (curPath.parentPath != null) {
         curPath = curPath.parentPath!;
+        fat.curPath = curPath; // 同步更新 FAT 的路径
       }
     });
   }
 
-   void _onUpdate() {
+  void _onPathSelected(Path newPath) {
     setState(() {
-      // 触发整个界面的重建，包括 FuncArea
+      curPath = newPath;
+      fat.curPath = newPath; // 同步 FAT 中的路径
     });
   }
+
+  void _onUpdate() {
+    setState(() {
+      // 触发整个界面的重建，包括功能区和文件显示
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return FluentUI.FluentApp(
@@ -83,7 +90,7 @@ class _MyAppState extends State<MyApp> {
           child: Column(
             children: [
               SizedBox(
-                height: 50, // 设置具体的高度
+                height: 50,
                 child: TopBar(
                   onCreateFolder: _createFolder,
                   onCreateFile: _createFile,
@@ -92,49 +99,58 @@ class _MyAppState extends State<MyApp> {
                 ),
               ),
               Expanded(
-                flex: 9, // 右边占30%
-                child: Container(
-                  child: Row(
-                    children: [
-                      Expanded(
-                        flex: 2,
-                        child: Catalog(fat: fat),
+                flex: 9,
+                child: Row(
+                  children: [
+                    Expanded(
+                      flex: 2,
+                      child: Catalog(
+                        fat: fat,
+                        currentPath: curPath,
+                        onPathSelected: _onPathSelected, // 实现路径同步
                       ),
-                      Expanded(
-                          flex: 5, // 右边占30%
-                          child: DisplayBox(
-                            fat: fat, 
-                            files: curPath.children
-                                .where((child) =>
-                                    fat.diskBlocks[child.diskNum].type ==
-                                    fat_utils.Type.FILE)
-                                .map((child) => fat.diskBlocks[child.diskNum]
-                                    .file!) // 直接传入文件对象
-                                .toList(),
-                            folders: curPath.children
-                                .where((child) =>
-                                    fat.diskBlocks[child.diskNum].type ==
-                                    fat_utils.Type.FOLDER)
-                                .map((child) => child.name)
-                                .toList(),
-                            onFolderTap: (folderName) {
-                              setState(() {
-                                curPath = curPath.children.firstWhere(
-                                  (child) =>
-                                      child.name == folderName &&
-                                      fat.diskBlocks[child.diskNum].type ==
-                                          fat_utils.Type.FOLDER,
-                                );
-                              });
-                            },
-                            onUpdate: _onUpdate,
-                          )),
-                      Expanded(
-                        flex: 3, // 右边占30%
-                        child: FuncArea(fat: fat),
+                    ),
+                    Expanded(
+                      flex: 5,
+                      child: DisplayBox(
+                        curPath: curPath,
+                        fat: fat,
+                        files: curPath.children
+                            .where((child) =>
+                                fat.diskBlocks[child.diskNum].type ==
+                                fat_utils.Type.FILE)
+                            .map((child) =>
+                                fat.diskBlocks[child.diskNum].file!) // 传入文件对象
+                            .toList(),
+                        folders: curPath.children
+                            .where((child) =>
+                                fat.diskBlocks[child.diskNum].type ==
+                                fat_utils.Type.FOLDER)
+                            .map((child) => child.name)
+                            .toList(),
+                        onFolderTap: (folderName) {
+                          setState(() {
+                            // 找到目标文件夹对应的路径
+                            Path selectedPath = curPath.children.firstWhere(
+                              (child) =>
+                                  child.name == folderName &&
+                                  fat.diskBlocks[child.diskNum].type ==
+                                      fat_utils.Type.FOLDER,
+                            );
+                            // 更新 FAT 的当前路径
+                            fat.curPath = selectedPath;
+                            // 同步更新本地的 curPath
+                            curPath = fat.curPath;
+                          });
+                        },
+                        onUpdate: _onUpdate,
                       ),
-                    ],
-                  ),
+                    ),
+                    Expanded(
+                      flex: 3,
+                      child: FuncArea(fat: fat),
+                    ),
+                  ],
                 ),
               ),
             ],
