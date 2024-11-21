@@ -36,29 +36,27 @@ class _CatalogState extends State<Catalog> {
                   children: [
                     Icon(
                       node.children.isEmpty ? Icons.folder : Icons.folder_open,
-                      size: 18, // 减小图标大小
                     ),
                     SizedBox(width: 8), // 减小图标与文本间距
                     Text(
                       node.name,
-                      style: TextStyle(fontSize: 14), // 调整字体大小
                     ),
                   ],
                 ),
-                children: node.children.map((child) => _buildTreeNode(child, depth + 1)).toList(),
+                children: node.children
+                    .map((child) => _buildTreeNode(child, depth + 1))
+                    .toList(),
               )
             : ListTile(
-                contentPadding: const EdgeInsets.symmetric(vertical: 4.0), // 减少上下间距
                 title: Row(
                   children: [
                     const Icon(
                       Icons.insert_drive_file,
                       size: 18, // 减小图标大小
                     ),
-                    SizedBox(width: 8), // 减小图标与文本间距
+                    const SizedBox(width: 8), // 减小图标与文本间距
                     Text(
                       node.name,
-                      style: TextStyle(fontSize: 14), // 调整字体大小
                     ),
                   ],
                 ),
@@ -70,13 +68,18 @@ class _CatalogState extends State<Catalog> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(border: Border.all(color: Colors.black, width: 1)),
+      decoration:
+          BoxDecoration(border: Border.all(color: Colors.black, width: 1)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Padding(
             padding: EdgeInsets.all(8.0),
-            child: Text('目录', style: TextStyle(color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold)),
+            child: Text('目录',
+                style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold)),
           ),
           Expanded(
             child: ListView(children: [_buildTreeNode(rootPath, 0)]),
