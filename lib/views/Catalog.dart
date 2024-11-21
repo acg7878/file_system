@@ -1,48 +1,85 @@
 import 'package:flutter/material.dart';
-import 'package:file_system/modles/FAT.dart';
-import 'package:file_system/modles/Path.dart';
-import 'package:file_system/utils/FAT_utils.dart' as fat_utils;
+import 'package:file_system/modles/Path.dart'; // 你的Path类
 
 class Catalog extends StatefulWidget {
-  final FAT fat;
-  final Path currentPath; // 当前路径
-  final Function(Path) onPathSelected; // 路径选择回调
+  final Path rootPath; // 根路径
+  final ValueChanged<Path> onPathSelected; // 路径更新回调
 
   const Catalog({
-    super.key,
-    required this.fat,
-    required this.currentPath,
+    Key? key,
+    required this.rootPath,
     required this.onPathSelected,
-  });
+  }) : super(key: key);
 
   @override
   _CatalogState createState() => _CatalogState();
 }
 
 class _CatalogState extends State<Catalog> {
+  late Path rootPath;
+
+  @override
+  void initState() {
+    super.initState();
+    rootPath = widget.rootPath;
+  }
+
+  // 构建树节点（文件夹和文件的通用处理）
+  Widget _buildTreeNode(Path node, int depth) {
+    return GestureDetector(
+      onDoubleTap: node.isFolder ? () => widget.onPathSelected(node) : null,
+      child: Padding(
+        padding: EdgeInsets.only(left: depth * 8.0), // 减少缩进
+        child: node.isFolder
+            ? ExpansionTile(
+                title: Row(
+                  children: [
+                    Icon(
+                      node.children.isEmpty ? Icons.folder : Icons.folder_open,
+                      size: 18, // 减小图标大小
+                    ),
+                    SizedBox(width: 8), // 减小图标与文本间距
+                    Text(
+                      node.name,
+                      style: TextStyle(fontSize: 14), // 调整字体大小
+                    ),
+                  ],
+                ),
+                children: node.children.map((child) => _buildTreeNode(child, depth + 1)).toList(),
+              )
+            : ListTile(
+                contentPadding: const EdgeInsets.symmetric(vertical: 4.0), // 减少上下间距
+                title: Row(
+                  children: [
+                    const Icon(
+                      Icons.insert_drive_file,
+                      size: 18, // 减小图标大小
+                    ),
+                    SizedBox(width: 8), // 减小图标与文本间距
+                    Text(
+                      node.name,
+                      style: TextStyle(fontSize: 14), // 调整字体大小
+                    ),
+                  ],
+                ),
+              ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(
-        border: Border.all(
-          color: Colors.black,
-          width: 1,
-        ),
-      ),
+      decoration: BoxDecoration(border: Border.all(color: Colors.black, width: 1)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            padding: const EdgeInsets.all(8.0),
-            child: const Text(
-              '目录',
-              style: TextStyle(
-                color: Colors.black,
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
+          const Padding(
+            padding: EdgeInsets.all(8.0),
+            child: Text('目录', style: TextStyle(color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold)),
+          ),
+          Expanded(
+            child: ListView(children: [_buildTreeNode(rootPath, 0)]),
           ),
         ],
       ),

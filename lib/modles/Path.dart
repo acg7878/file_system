@@ -1,15 +1,15 @@
-//import 'package:file_system/utils/FAT_utils.dart';
 
 class Path {
   String name;
   int diskNum;
   Path? parentPath;
   List<Path> children = [];
-
+  bool isFolder;
   Path({
     required this.name,
     required this.diskNum,
     this.parentPath,
+    this.isFolder = true,
   });
 
   String getAbsolutePath() {

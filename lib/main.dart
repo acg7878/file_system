@@ -52,12 +52,14 @@ class _MyAppState extends State<MyApp> {
     setState(() {
       fat.createFolder(curPath);
     });
+
   }
 
   void _createFile() {
     setState(() {
       fat.createFile(curPath);
     });
+
   }
 
   void _goBack() {
@@ -103,15 +105,14 @@ class _MyAppState extends State<MyApp> {
                 child: Row(
                   children: [
                     Expanded(
-                      flex: 2,
+                      flex: 3,
                       child: Catalog(
-                        fat: fat,
-                        currentPath: curPath,
-                        onPathSelected: _onPathSelected, // 实现路径同步
+                        rootPath: fat.rootPath, // 目录树的根路径
+                        onPathSelected: _onPathSelected, // 选中路径时的回调
                       ),
                     ),
                     Expanded(
-                      flex: 5,
+                      flex: 4,
                       child: DisplayBox(
                         curPath: curPath,
                         fat: fat,
