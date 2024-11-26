@@ -12,15 +12,14 @@ import 'package:file_system/utils/FAT_utils.dart' as fat_utils;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await windowManager.ensureInitialized();
-
   WindowOptions windowOptions = const WindowOptions(
     size: Size(1100, 750),
     center: true,
-    backgroundColor: FluentUI.Colors.white,
   );
+  
   windowManager.waitUntilReadyToShow(windowOptions, () async {
     await windowManager.setMinimumSize(const Size(1100, 750));
-    await windowManager.setMaximumSize(const Size(1100, 750));
+    await windowManager.setMaximumSize(const Size(1100, 750)); 
     await windowManager.show();
     await windowManager.focus();
   });
@@ -52,14 +51,12 @@ class _MyAppState extends State<MyApp> {
     setState(() {
       fat.createFolder(curPath);
     });
-
   }
 
   void _createFile() {
     setState(() {
       fat.createFile(curPath);
     });
-
   }
 
   void _goBack() {
@@ -88,6 +85,7 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return FluentUI.FluentApp(
       home: Scaffold(
+        backgroundColor: FluentUI.Colors.white, // 设置 Scaffold 背景颜色
         body: Center(
           child: Column(
             children: [
