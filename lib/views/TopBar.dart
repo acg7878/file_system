@@ -1,4 +1,3 @@
-//import 'package:flutter/material.dart' as material;
 import 'package:fluent_ui/fluent_ui.dart';
 
 class TopBar extends StatelessWidget {
@@ -20,26 +19,27 @@ class TopBar extends StatelessWidget {
       padding: const EdgeInsets.all(8.0), // 设置所有方向的边距为 8.0
       child: Row(
         children: [
-          Row(
-            children: [
-              IconButton(
-                icon: const Icon(FluentIcons.chrome_back, size: 20.0),
-                onPressed: onBack,
-              ),
-              const Text(
-                '当前路径: ',
-                style: TextStyle(fontSize: 16.0),
-              ),
-              SizedBox(
-                width: 500, // 设置 TextBox 的宽度
-                child: TextBox(
-                  placeholder: currentPath,
-                  enabled: false,
+          Expanded(
+            child: Row(
+              children: [
+                IconButton(
+                  icon: const Icon(FluentIcons.chrome_back, size: 20.0),
+                  onPressed: onBack,
                 ),
-              ), 
-            ],
+                const Text(
+                  '当前路径: ',
+                  style: TextStyle(fontSize: 16.0),
+                ),
+                Expanded(
+                  child: TextBox(
+                    placeholder: currentPath,
+                    enabled: false,
+                  ),
+                ),
+              ],
+            ),
           ),
-          const Spacer(), // 添加 Spacer 以将右边的按钮推到最右边
+          const SizedBox(width: 8),
           FilledButton(
             onPressed: onCreateFile,
             child: const Text('新建文件'),
@@ -48,7 +48,7 @@ class TopBar extends StatelessWidget {
           FilledButton(
             onPressed: onCreateFolder,
             child: const Text('新建文件夹'),
-          )
+          ),
         ],
       ),
     );
