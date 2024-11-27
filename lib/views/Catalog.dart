@@ -6,10 +6,10 @@ class Catalog extends StatefulWidget {
   final ValueChanged<Path> onPathSelected; // 路径更新回调
 
   const Catalog({
-    Key? key,
+    super.key,
     required this.rootPath,
     required this.onPathSelected,
-  }) : super(key: key);
+  });
 
   @override
   _CatalogState createState() => _CatalogState();
@@ -37,7 +37,7 @@ class _CatalogState extends State<Catalog> {
                     Icon(
                       node.children.isEmpty ? Icons.folder : Icons.folder_open,
                     ),
-                    SizedBox(width: 8), // 减小图标与文本间距
+                    const SizedBox(width: 8), // 减小图标与文本间距
                     Text(
                       node.name,
                     ),
